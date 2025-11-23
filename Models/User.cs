@@ -10,7 +10,7 @@
         public string FullName { get; set; } = string.Empty;
         public UserRole Role { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ICollection<Course> Enrollments { get; set; } = new List<Course>();
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public ICollection<Course> CreatedCourses { get; set; } = new List<Course>();
     }
 

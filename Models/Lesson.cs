@@ -9,7 +9,7 @@
         public int OrderIndex { get; set; }
         public int DurationInMinutes { get; set; }
         public int CourseId { get; set; }
-        public Course course { get; set; } = null!;
+        public Course Course { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
     }
 }

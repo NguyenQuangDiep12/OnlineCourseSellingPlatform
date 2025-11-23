@@ -4,9 +4,9 @@
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User user { get; set; } = null!;
+        public User User { get; set; } = null!;
         public int CourseId { get; set; }
-        public Course course { get; set; } = null!;
+        public Course Course { get; set; } = null!;
         public DateTime EnrolledAt { get; set; }
         public decimal PricePaid { get; set; } 
         public EnrollmentStatus Status { get; set; }
