@@ -23,21 +23,17 @@ namespace OnlineCourseSellingPlatform.Services
             _jwtTokenGenerator = jwtTokenGenerator;
         }
 
-        public Task<User?> GetUserByEmail(string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public Task<ApiResponseDto<string>> LoginAsync(LoginDto dto)
-        {
-            throw new NotImplementedException();
-        }
 
-        public async Task<ApiResponseDto<UserResponseDto>> RegisterAsync(RegisterDto dto)
+        public async Task<ApiResponse<UserResponseDto>> RegisterAsync(RegisterDto dto)
         {
             if(await _context.Users.AnyAsync(u => u.Email == dto.Email))
             {
-                return new ApiResponseDto<UserResponseDto>
+                return new ApiResponse<UserResponseDto>
                 {
                     Success = false,
                     Message = "Email already exists"
@@ -51,6 +47,43 @@ namespace OnlineCourseSellingPlatform.Services
                 FullName = dto.FullName,
                 Role = UserRole.Student,
                 CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(user); // Mark the user entity for addition
+            await _context.SaveChangesAsync(); // Persist changes to the database
+
+            return new ApiResponse<UserResponseDto>
+            {
+                Success = true,
+                Message = "User registered Successfully",
+                Data = new UserResponseDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Role = user.Role.ToString()
+                }
+            };
+        }
+        public async Task<ApiResponse<string>> LoginAsync(LoginDto dto)
+        {
+            var user = await GetUserByEmail(dto.Email);
+            if(user == null || !_passwordHasher.VerifyPassword(dto.Password, user.PasswordHash))
+            {
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Invalid email or password"
+                };
+            }
+
+            var token = _jwtTokenGenerator.GenerateToken(user);
+
+            return new ApiResponse<string>
+            {
+                Success = true,
+                Message = "Login Successful",
+                Data = token
             };
         }
     }

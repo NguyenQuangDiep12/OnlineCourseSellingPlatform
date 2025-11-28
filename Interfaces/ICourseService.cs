@@ -4,11 +4,11 @@ namespace OnlineCourseSellingPlatform.Interfaces
 {
     public interface ICourseService
     {
-        Task<ApiResponseDto<CourseResponseDto>> CreateCourseAsync(CreateCourseDto dto, int InstructorId);
-        Task<ApiResponseDto<CourseResponseDto>> UpdateCourseAsync(int CourseId, UpdateCourseDto dto, int InstructorId);
-        Task<ApiResponseDto<bool>> DeleteCourseAsync(int CourseId, int InstructorId);
-        Task<ApiResponseDto<CourseDetailDto>> GetCourseByIdAsync(int CourseId);
-        Task<ApiResponseDto<PaginatedResponse<CourseResponseDto>>> GetCourseAsync(int PageNumber, int PageSize, string? SearchTerm);
-        Task<ApiResponseDto<List<CourseResponseDto>>> GetCoursesByInstructorAsync(int InstructorId);
+        Task<ApiResponse<CourseResponseDto>> CreateCourseAsync(CreateCourseDto dto, int InstructorId);
+        Task<ApiResponse<CourseResponseDto>> UpdateCourseAsync(int CourseId, UpdateCourseDto dto, int InstructorId);
+        Task<ApiResponse<bool>> DeleteCourseAsync(int CourseId, int InstructorId);
+        Task<ApiResponse<CourseDetailDto>> GetCourseByIdAsync(int CourseId);
+        Task<ApiResponse<PaginatedResponse<CourseResponseDto>>> GetCourseAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<ApiResponse<List<CourseResponseDto>>> GetCoursesByInstructorAsync(int InstructorId);
     }
 }
