@@ -1,4 +1,11 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using OnlineCourseSellingPlatform.Data;
+using OnlineCourseSellingPlatform.Interfaces;
+using OnlineCourseSellingPlatform.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 // đăng ký dịch vụ api endpoints cho project giúp swagger (OpenApi) tự động đọc được các endpoint của dự án
 builder.Services.AddEndpointsApiExplorer();
+// đăng ký dịch vụ truy cập HttpContext hiện tại trong các lớp dịch vụ
+builder.Services.AddHttpContextAccessor();
 #endregion
 
 
@@ -58,19 +67,61 @@ builder.Services.AddSwaggerGen(c =>
 #endregion
 
 #region Database configuration here
-
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("OnlineCourseSellingPlatform")));
 #endregion
 
 #region Jwt Authentication Configuration here
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new Exception("Missing Jwt Key!");
+var key = Encoding.UTF8.GetBytes(jwtKey);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+builder.Services.AddAuthorization();
 #endregion
 
 #region Dependency Injection Configuration here
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
 #endregion
 
 #region CORS Configuration here
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 #endregion
 
 // Build the app
@@ -80,11 +131,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Course Platform Api v1");
+        c.RoutePrefix = string.Empty; // Swagger at root
+    });
 }
 
+app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

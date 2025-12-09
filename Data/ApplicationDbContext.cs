@@ -9,7 +9,6 @@ namespace OnlineCourseSellingPlatform.Data
         {
 
         }
-
         public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
@@ -27,7 +26,7 @@ namespace OnlineCourseSellingPlatform.Data
                 entity.HasIndex(e => e.Email).IsUnique();
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
             });
 
             // Course entity configuration
@@ -69,7 +68,7 @@ namespace OnlineCourseSellingPlatform.Data
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.Cascade);
                 entity.Property(e => e.EnrolledAt).HasDefaultValueSql("GETDATE()");
-                entity.Property(e => e.PricePaid).HasColumnType("decimal(18,2");
+                entity.Property(e => e.PricePaid).HasColumnType("decimal(18,2)");
             });
 
             // Payment entity configuration

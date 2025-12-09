@@ -4,37 +4,39 @@ using System.Security.Cryptography;
 
 namespace OnlineCourseSellingPlatform.Services
 {
-    public class PasswordHaser : IPasswordHasher
+    public class PasswordHasher : IPasswordHasher
     {
-        public string HashPassword(string Password)
+        public string HashPassword(string password)
         {
-            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
-            string Hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: Password,
+            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); // 16 bytes salt
+
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
-            return $"{Convert.ToBase64String(salt)}.{Hashed}";
+            return $"{Convert.ToBase64String(salt)}.{hashed}";
         }
 
-        public bool VerifyPassword(string Password, string ProvidedPassword)
+        public bool VerifyPassword(string password, string storedHash)
         {
-            var parts = Password.Split('.');
+            var parts = storedHash.Split('.');
             if (parts.Length != 2) return false;
 
-            var salt = Convert.FromBase64String(parts[0]); // decode salt
-            var hash = parts[1];
+            var salt = Convert.FromBase64String(parts[0]);
+            var correctHash = parts[1];
 
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: Password,
+                password: password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8
-                ));
-            return hash == hashed;
+            ));
+
+            return hashed == correctHash;
         }
     }
 }
