@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Course Platform API",       // Tên API hiển thị trên Swagger UI
         Version = "v1",                      // Phiên bản API
-        Description = "RESTful API for Online Course Platform" // Mô tả API
+        Description = "RESTful API for Online Course Platform with Categories, Reviews, Wishlist, and Admin Dashboard" // Mô tả API
     });
 
     // định nghĩa thêm version khi mở rộng
@@ -102,6 +102,7 @@ builder.Services.AddAuthorization();
 #endregion
 
 #region Dependency Injection Configuration here
+// Core Services
 builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
@@ -109,6 +110,12 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+// New Services
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 #endregion
 

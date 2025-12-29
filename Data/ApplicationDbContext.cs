@@ -14,6 +14,9 @@ namespace OnlineCourseSellingPlatform.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +32,16 @@ namespace OnlineCourseSellingPlatform.Data
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
             });
 
+            // Category entity configuration
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Slug).IsUnique();
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Slug).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
             // Course entity configuration
             modelBuilder.Entity<Course>(entity =>
             {
@@ -41,6 +54,11 @@ namespace OnlineCourseSellingPlatform.Data
                     .WithMany(u => u.CreatedCourses)
                     .HasForeignKey(e => e.InstructorId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Category)
+                    .WithMany(c => c.Courses)
+                    .HasForeignKey(e => e.CategoryId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Lesson entity configuration
@@ -77,6 +95,47 @@ namespace OnlineCourseSellingPlatform.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Amount).IsRequired().HasColumnType("decimal(18,2)");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+            // Review entity configuration
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Rating).IsRequired();
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Reviews)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Course)
+                    .WithMany(c => c.Reviews)
+                    .HasForeignKey(e => e.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Ensure one review per user per course
+                entity.HasIndex(e => new { e.UserId, e.CourseId }).IsUnique();
+            });
+
+            // Wishlist entity configuration
+            modelBuilder.Entity<Wishlist>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.AddedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Wishlists)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Course)
+                    .WithMany(c => c.Wishlists)
+                    .HasForeignKey(e => e.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Ensure one wishlist entry per user per course
+                entity.HasIndex(e => new { e.UserId, e.CourseId }).IsUnique();
             });
         }
     }
