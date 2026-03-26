@@ -8,21 +8,6 @@ Dự án đã được mở rộng với 4 chức năng chính mới:
 3. **Wishlist** - Danh sách yêu thích
 4. **Admin Dashboard** - Bảng điều khiển quản trị
 
-##  Thống kê
-
-### Files Mới (21 files):
-- **Models**: 3 files (Category, Review, Wishlist)
-- **DTOs**: 4 files (CategoryDtos, ReviewDtos, WishlistDtos, AdminDtos)
-- **Interfaces**: 4 files (ICategoryService, IReviewService, IWishlistService, IAdminService)
-- **Services**: 4 files (CategoryService, ReviewService, WishlistService, AdminService)
-- **Controllers**: 4 files (CategoriesController, ReviewsController, WishlistController, AdminController)
-- **Documentation**: 2 files (README.md updated, MIGRATION_GUIDE.md)
-
-### Files Cập nhật (4 files):
-- **Models**: Course.cs, User.cs
-- **Data**: ApplicationDbContext.cs
-- **Root**: Program.cs
-
 ## Chi tiết từng chức năng
 
 ### 1. Category Management
