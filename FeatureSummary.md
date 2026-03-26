@@ -62,7 +62,7 @@ Table: Courses (Updated)
 
 ---
 
-### 2. ⭐ Review & Rating System
+### 2. Review & Rating System
 
 **Mục đích**: Cho phép học viên đánh giá khóa học
 
